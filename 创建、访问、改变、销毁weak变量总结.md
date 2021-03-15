@@ -1,3 +1,5 @@
+
+
 ## 创建、访问、改变、销毁weak变量总结
 
 #### 我们都知道:
@@ -32,11 +34,11 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
-
-
 汇编如下:
 
 ![](https://tva1.sinaimg.cn/large/e6c9d24ely1gol000a0uqj20r10dlq6e.jpg)
+
+
 
 ##### 先看初始化weak变量、改变weak变量的指向和销毁weak变量这三个函数:
 
@@ -111,11 +113,21 @@ else {
 }
 ```
 
+总结: 
+
+| 函数             | 调用             | haveOld:<br />weak_unregister_no_lock | haveNew:<br />weak_register_no_lock |
+| ---------------- | ---------------- | ------------------------------------- | ----------------------------------- |
+| objc_initWeak    | weak变量初始化   | false                                 | true                                |
+| objc_storeWeak   | weak变量指向改变 | true                                  | true                                |
+| objc_destroyWeak | weak变量销毁     | true                                  | false                               |
+
 > objc_destroyWeak函数是销毁weak变量时调用的, 而在对象的dealloc时会调用一系列函数:
 >
 > dealloc->_objc_rootDealloc->rootDealloc->object_dispose->objc_destructInstance->clearDeallocating->clearDeallocating_slow->weak_clear_no_lock
 >
 > 最后的weak_clear_no_lock函数会遍历weak_entry_t的定长数组或哈希数组把所有指向该对象的weak指针置为nil, weak_entry_t也会被移除
+
+
 
 ##### 再来看一下改变weak变量的指向时调用的函数objc_loadWeakRetained和_objc_release:
 
@@ -127,7 +139,9 @@ if (! obj->rootTryRetain()) {
 }
 ```
 
-rootTryRetain()函数内部会对对象做一次retain操作, 而这个操作会被后面调用的_objc_release抵消掉
+rootTryRetain()函数内部会对对象做一次retain操作, 而这个操作会被后面调用的_objc_release抵消掉, 所以对象的引用计数不会变
+
+
 
 ##### 最后看一下MRC下的汇编
 
@@ -146,13 +160,15 @@ id objc_loadWeak(id *location)
 MRC下objc_loadWeakRetained函数的retain操作是由添加到autoreleasepool抵消的
 
 > 这也解释了《Objective-C高级编程iOS与OS X多线程和内存管理》这本书1.4.2节提到的: 使用附有__weak修饰符的变量, 即是使用注册到autoreleasepool中的对象
+>
+> ![](https://tva1.sinaimg.cn/large/e6c9d24ely1gol2961gxnj20ra077mxw.jpg)
 
 简单证明一下:
 
-// ARC下
+ARC下
 
 ![](https://tva1.sinaimg.cn/large/e6c9d24egy1gol01jurelj20gt0a30ty.jpg)
 
-// MRC下
+MRC下
 
 ![](https://tva1.sinaimg.cn/large/e6c9d24egy1gol01t48zdj20h60ajaba.jpg)
