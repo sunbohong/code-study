@@ -4,7 +4,7 @@
 
 * weak变量对指向的对象是弱引用, 不会使对象的引用计数+1
 
-* weak变量指向的对象销毁时会被置为nil
+* weak变量指向的对象销毁时指针会被置为nil
 
 * weak变量的内存管理是依赖SideTable(s)、weak_table_t、weak_entry_t
   * SideTables是静态全局哈希表, 容量固定, iOS中有8张SideTable
