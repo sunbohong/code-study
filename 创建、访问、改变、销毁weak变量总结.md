@@ -1,5 +1,3 @@
-
-
 ## 创建、访问、改变、销毁weak变量总结
 
 #### 我们都知道:
@@ -126,6 +124,8 @@ else {
 > dealloc->_objc_rootDealloc->rootDealloc->object_dispose->objc_destructInstance->clearDeallocating->clearDeallocating_slow->weak_clear_no_lock
 >
 > 最后的weak_clear_no_lock函数会遍历weak_entry_t的定长数组或哈希数组把所有指向该对象的weak指针置为nil, weak_entry_t也会被移除
+>
+> ![](https://tva1.sinaimg.cn/large/e6c9d24egy1golr62vceqj207g09zq3d.jpg)
 
 
 
