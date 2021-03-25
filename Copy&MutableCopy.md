@@ -1,6 +1,6 @@
 # Copy & MutableCopy
 ### copy&mutableCopy介绍
-&emsp;&emsp;&emsp;&emsp;`copy`和`mutableCopy`，深浅拷贝，在OC里面是两个协议`NSCopying`和`NSMutableCopying`，分别对应的方法如下：
+&emsp;&emsp;`copy`和`mutableCopy`，不可变副本拷贝和可变副本拷贝，在OC里面是两个协议`NSCopying`和`NSMutableCopying`，分别对应的方法如下：
 ```Objective-C
 @protocol NSCopying
 
@@ -14,7 +14,7 @@
 
 @end
 ```
-&emsp;&emsp;&emsp;&emsp;在`NSObject`根类里面类对象实现了两个协议方法，而实例对象没有实现，所以不能直接对`NSObject`的实例对象进行`copy`和`mutableCopy`
+&emsp;&emsp;在`NSObject`根类里面类对象实现了两个协议方法，而实例对象没有实现，所以不能直接对`NSObject`的实例对象进行`copy`和`mutableCopy`
 ```
 + (id)copy {
     return (id)self;
@@ -76,9 +76,9 @@ int main(int argc, const char * argv[]) {
 ```
 person:0x100518ac0, copyPerson:0x10050e230, mutablePerson:0x100518ac0
 ```
-上面这个例子想说明什么，OC里面的深浅拷贝都是各个类自己实现的。所以像字符串，数组，字典，这三个对其进行`copy`和`mutableCopy`，都会发生什么，那就要看源码了
+上面这个例子想说明什么，OC里面的副本拷贝都是各个类自己实现的。所以像字符串，数组，字典，这三个对其进行`copy`和`mutableCopy`，都会发生什么，那就要看源码了
 ### 字符串
-&emsp;&emsp;&emsp;&emsp;字符串`copy`和`mutableCopy`的实现，我们经常使用的是`NSString`和`NSMutableString`，虽然我们这样写，但是他真正的类是什么，我们看下`demo`
+&emsp;&emsp;字符串`copy`和`mutableCopy`的实现，我们经常使用的是`NSString`和`NSMutableString`，虽然我们这样写，但是他真正的类是什么，我们看下`demo`
 ```
         NSString *tagString = [NSString stringWithFormat:@"%@", @"123"];
         /// 这种方式是NSTaggedPointerString
@@ -178,8 +178,8 @@ mutaString-ptr:0x101404330, mutaString1-ptr:0x101404440, mutaString2-ptr:0x10140
 
 |  | NSTaggedPointerString | __NSCFConstantString | __NSCFString |
 | --- | --- | --- | --- |
-| copy | 浅拷贝 | 浅拷贝 | 深拷贝 |
-| mutableCopy | 深拷贝 | 深拷贝 | 深拷贝 |
+| copy | 不可变副本拷贝 | 不可变副本拷贝 | 可变副本拷贝 |
+| mutableCopy | 可变副本拷贝 | 可变副本拷贝 | 可变副本拷贝 |
 
 ### 数组
 
@@ -281,8 +281,8 @@ CoreFoundation`-[__NSArrayM copy]:
 
 |  | NSArray | NSMutableArray | NSString | NSMutableString |
 | --- | --- | --- | --- | --- |
-| copy | 浅拷贝（返回自身） | 深拷贝（返回创建的NSArray） | 浅拷贝（返回自身） | 深拷贝（返回创建的__NSCFString） |
-| mutableCopy | 深拷贝（返回创建的NSMutableArray） | 深拷贝（返回创建NSMutableArray） | 深拷贝（返回创建的__NSCFString） | 深拷贝（返回创建的__NSCFString） |
+| copy | 不可变副本拷贝（返回自身） | 可变副本拷贝（返回创建的NSArray） | 不可变副本拷贝（返回自身） | 可变副本拷贝（返回创建的__NSCFString） |
+| mutableCopy | 可变副本拷贝（返回创建的NSMutableArray） | 可变副本拷贝（返回创建NSMutableArray） | 可变副本拷贝（返回创建的__NSCFString） | 可变副本拷贝（返回创建的__NSCFString） |
 
 
 个人感觉这些都是系统实现好的方法，记一下就可以了，真的像最开始说的，你可以重写这些方法，想怎么实现就怎么实现，想new新对象，就new
